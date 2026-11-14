@@ -40,6 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let searchQuery = "";
   let currentDay = "";
   let currentTimeRange = "";
+  let sharedActivityRevealed = false;
 
   // Authentication state
   let currentUser = null;
@@ -473,12 +474,24 @@ document.addEventListener("DOMContentLoaded", () => {
     Object.entries(filteredActivities).forEach(([name, details]) => {
       renderActivityCard(name, details);
     });
+
+    if (!sharedActivityRevealed) {
+      const sharedCard = document.getElementById(window.location.hash.slice(1));
+      if (sharedCard && sharedCard.classList.contains("activity-card")) {
+        sharedCard.classList.add("shared-activity");
+        sharedCard.tabIndex = -1;
+        sharedCard.focus({ preventScroll: true });
+        sharedCard.scrollIntoView({ block: "center" });
+        sharedActivityRevealed = true;
+      }
+    }
   }
 
   // Function to render a single activity card
   function renderActivityCard(name, details) {
     const activityCard = document.createElement("div");
     activityCard.className = "activity-card";
+    activityCard.id = `activity-${encodeURIComponent(name)}`;
 
     // Calculate spots and capacity
     const totalSpots = details.max_participants;
@@ -590,6 +603,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
+    activityCard.appendChild(createActivitySharing(name));
     activitiesList.appendChild(activityCard);
   }
 
